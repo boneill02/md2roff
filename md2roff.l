@@ -10,7 +10,7 @@ STRING [a-zA-Z0-9?!.,]*
 WHITESPACE [ \t]
 
 %%
-"# " printf(".SH 1\n%s", &yytext[2]);
+"# " printf(".TL\n%s", &yytext[2]);
 "## " printf(".SH 2\n%s", &yytext[3]);
 "### " printf(".SH 3\n%s", &yytext[4]);
 "#### " printf(".SH 4\n%s", &yytext[5]);
