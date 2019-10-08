@@ -13,11 +13,11 @@
 
 ## How?? (Part 2) (for UNIX noobs using groff)
 
-`cat "mymarkdown.md" | ./md2roff | groff -ms -Tpdf > output.pdf`
+`cat "mymarkdown.md" | ./md2roff | groff -ms -Tpdf >output.pdf`
 
 ## How?? (Part 2) (for UNIX chads using Heirloom Doctools)
 
-`cat "mymarkdown.md" | ./md2roff | troff -ms | dpost > output.ps`
+`cat "mymarkdown.md" | ./md2roff | troff -ms | dpost >output.ps`
 
 ## Why??
 
