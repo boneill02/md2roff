@@ -26,7 +26,8 @@ enum {
 %}
 
 %option noyywrap
-STRING [a-zA-Z0-9!@#$%^&(),. \t]
+%option no
+STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 
 %%
 "# "{STRING}+"\n" do_pre(yytext, PRE_SH1);
@@ -34,13 +35,21 @@ STRING [a-zA-Z0-9!@#$%^&(),. \t]
 "### "{STRING}+"\n" do_pre(yytext, PRE_SH3);
 "#### "{STRING}+"\n" do_pre(yytext, PRE_SH4);
 "##### "{STRING}+"\n" do_pre(yytext, PRE_SH5);
-"* "{STRING}+"\n" do_pre(yytext, PRE_IP);
+"* " do_pre(yytext, PRE_IP);
 "***"{STRING}+"***" do_surround(yytext, SUR_BI);
 "**"{STRING}+"**" do_surround(yytext, SUR_B);
 "*"{STRING}+"*" do_surround(yytext, SUR_I);
 "__"{STRING}+"__" do_surround(yytext, SUR_UL);
 "`"{STRING}+"`" do_surround(yytext, SUR_M);
+"\n\n" printf("\n.PP\n");
 %%
+
+int main(int argc, char *argv[])
+{
+	printf(".fp 8 C\n");
+	yylex();
+	return 0;
+}
 
 void do_pre(char *text, int type)
 {
@@ -50,7 +59,7 @@ void do_pre(char *text, int type)
 		case PRE_SH3: printf(".SH\n%s\n.PP", strip_whitespace(&text[4])); break;
 		case PRE_SH4: printf(".SH\n%s\n.PP", strip_whitespace(&text[5])); break;
 		case PRE_SH5: printf(".SH\n%s\n.PP", strip_whitespace(&text[6])); break;
-		case PRE_IP:  printf(".IP -\n%s\n.PP", strip_whitespace(&text[2])); break;
+		case PRE_IP:  printf(".IP -"); break;
 		default: fprintf(stderr, "error: unimplemented\n");
 	}
 	printf("\n");
@@ -61,9 +70,9 @@ void do_surround(char *text, int type)
 	switch (type) {
 		case SUR_BI: printf(".B\n.I\n%s\n.R", strip_surround(text, 3)); break;
 		case SUR_B: printf("\n.B \"%s\"", strip_surround(text, 2)); break;
-		case SUR_I: printf("\n.I \"%s\"", strip_surround(text, 1)); break;
+		case SUR_I: printf("\n.I \"%s\"\n", strip_surround(text, 1)); break;
 		case SUR_UL: printf("\n.UL \"%s\"", strip_surround(text, 2)); break;
-		case SUR_M: printf("\n.M \"%s\"", strip_surround(text, 1)); break;
+		case SUR_M: printf("\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
 		default: fprintf(stderr, "error: unimplemented\n");
 	}
 	printf("\n");
