@@ -17,4 +17,8 @@ lex.yy.o: lex.yy.c
 clean:
 	rm -f md2roff lex.yy.o lex.yy.c
 
+install:
+	cp md2roff $(PREFIX)/bin/md2roff
+	cp md2roff.1 $(MANPREFIX)/man1/md2roff.1
+
 .PHONY: all clean
