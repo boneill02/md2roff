@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <string.h>
 void do_pre(char *text, int type);
 void do_surround(char *text, int type);
 
@@ -46,14 +47,36 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 
 int main(int argc, char *argv[])
 {
+	char *file;
+
 	printf(".fp 8 C\n");
 
 	++argv, --argc;
 	if (argc > 0) {
 		for (int i = 0; i < argc; i++) {
-			yyin = fopen(argv[i], "r");
-			yylex();
+			if (*argv[i] == '-' && strlen(argv[i]) > 1) {
+				switch (argv[i][1]) {
+					case 't': /* set title */
+						printf(".TL\n%s\n", argv[++i]);
+						break;
+					case 'a': /* set author */
+						printf(".AU\n%s\n", argv[++i]);
+						break;
+					case 'b': /* break front page */
+						printf(".RP no\n");
+						break;
+					case 'n': /* no date display */
+						printf(".ND \"\"\n");
+						break;
+					default:
+						printf("usage: md2roff [-b] [-t title] [-a author] [file...]\n");
+				}
+			} else {
+				file = argv[i];
+			}
 		}
+		yyin = fopen(file, "r");
+		yylex();
 	} else {
 		yyin = stdin;
 		yylex();
@@ -64,11 +87,11 @@ int main(int argc, char *argv[])
 void do_pre(char *text, int type)
 {
 	switch (type) {
-		case PRE_SH1: printf(".TL\n%s\n.PP", strip_whitespace(&text[2])); break;
-		case PRE_SH2: printf(".NH 1\n%s\n.PP", strip_whitespace(&text[3])); break;
-		case PRE_SH3: printf(".NH 2\n%s\n.PP", strip_whitespace(&text[4])); break;
-		case PRE_SH4: printf(".NH 3\n%s\n.PP", strip_whitespace(&text[5])); break;
-		case PRE_SH5: printf(".NH 4\n%s\n.PP", strip_whitespace(&text[6])); break;
+		case PRE_SH1: printf(".NH 1\n%s\n.PP", strip_whitespace(&text[2])); break;
+		case PRE_SH2: printf(".NH 2\n%s\n.PP", strip_whitespace(&text[3])); break;
+		case PRE_SH3: printf(".NH 3\n%s\n.PP", strip_whitespace(&text[4])); break;
+		case PRE_SH4: printf(".NH 4\n%s\n.PP", strip_whitespace(&text[5])); break;
+		case PRE_SH5: printf(".NH 5\n%s\n.PP", strip_whitespace(&text[6])); break;
 		case PRE_IP:  printf(".IP -"); break;
 		default: fprintf(stderr, "error: unimplemented\n");
 	}
