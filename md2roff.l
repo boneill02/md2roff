@@ -66,10 +66,10 @@ void do_pre(char *text, int type)
 {
 	switch (type) {
 		case PRE_SH1: printf(".TL\n%s\n.PP", strip_whitespace(&text[2])); break;
-		case PRE_SH2: printf(".SH\n%s\n.PP", strip_whitespace(&text[3])); break;
-		case PRE_SH3: printf(".SH\n%s\n.PP", strip_whitespace(&text[4])); break;
-		case PRE_SH4: printf(".SH\n%s\n.PP", strip_whitespace(&text[5])); break;
-		case PRE_SH5: printf(".SH\n%s\n.PP", strip_whitespace(&text[6])); break;
+		case PRE_SH2: printf(".NH 1\n%s\n.PP", strip_whitespace(&text[3])); break;
+		case PRE_SH3: printf(".NH 2\n%s\n.PP", strip_whitespace(&text[4])); break;
+		case PRE_SH4: printf(".NH 3\n%s\n.PP", strip_whitespace(&text[5])); break;
+		case PRE_SH5: printf(".NH 4\n%s\n.PP", strip_whitespace(&text[6])); break;
 		case PRE_IP:  printf(".IP -"); break;
 		default: fprintf(stderr, "error: unimplemented\n");
 	}
