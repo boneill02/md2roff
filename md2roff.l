@@ -47,7 +47,7 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 int main(int argc, char *argv[])
 {
 	printf(".fp 8 C\n");
-	
+
 	++argv, --argc;
 	if (argc > 0) {
 		for (int i = 0; i < argc; i++) {
@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
 		}
 	} else {
 		yyin = stdin;
-		printf(".fp 8 C\n");
 		yylex();
 	}
 	return 0;
