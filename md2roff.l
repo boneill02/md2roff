@@ -49,35 +49,40 @@ int main(int argc, char *argv[])
 {
 	char *file;
 
-	printf(".fp 8 C\n");
 
 	++argv, --argc;
 	if (argc > 0) {
 		for (int i = 0; i < argc; i++) {
 			if (*argv[i] == '-' && strlen(argv[i]) > 1) {
-				switch (argv[i][1]) {
-					case 't': /* set title */
-						printf(".TL\n%s\n", argv[++i]);
-						break;
-					case 'a': /* set author */
-						printf(".AU\n%s\n", argv[++i]);
-						break;
-					case 'b': /* break front page */
-						printf(".RP no\n");
-						break;
-					case 'n': /* no date display */
-						printf(".ND \"\"\n");
-						break;
-					default:
-						printf("usage: md2roff [-b] [-t title] [-a author] [file...]\n");
+				for (int j = 1; j < strlen(argv[i]); j++) {
+					switch (argv[i][j]) {
+						case 't': /* set title */
+							printf(".TL\n%s\n", argv[++i]);
+							break;
+						case 'a': /* set author */
+							printf(".AU\n%s\n", argv[++i]);
+							break;
+						case 'b': /* break front page */
+							printf(".RP no\n");
+							break;
+						case 'n': /* no date display */
+							printf(".ND \"\"\n");
+							break;
+						default:
+							fprintf(stderr, "usage: md2roff [-bn] [-t title] [-a author] [file...]\n");
+							exit(EXIT_FAILURE);
+					}
 				}
 			} else {
 				file = argv[i];
 			}
 		}
+		printf(".fp 8 C\n");
 		yyin = fopen(file, "r");
 		yylex();
 	} else {
+		printf(".fp 8 C\n");
+		yyin = fopen(file, "r");
 		yyin = stdin;
 		yylex();
 	}
