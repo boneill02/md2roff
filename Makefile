@@ -21,4 +21,10 @@ install:
 	cp md2roff $(PREFIX)/bin/md2roff
 	cp md2roff.1 $(MANPREFIX)/man1/md2roff.1
 
+uninstall:
+	rm -f $(PREFIX)/bin/md2roff $(MANPREFIX)/man1/md2roff.1
+
+test: md2roff
+	sh test.sh
+
 .PHONY: all clean

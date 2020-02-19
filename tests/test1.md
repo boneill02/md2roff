@@ -4,7 +4,7 @@
 
 Paragraph
 
-Another paragraph
-*Continued*
+Another paragraph *Continued*
 
 **Bold** *Italic*
+***Bold and Italic***
