@@ -4,8 +4,12 @@
 void do_pre(char *text, int type);
 void do_surround(char *text, int type);
 
+void print_head(void);
+
 char *strip_surround(char *str, int len);
 char *strip_whitespace(char *str);
+
+void usage(void);
 
 enum {
 	PRE_TL,
@@ -45,32 +49,42 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 "\n\n" printf("\n.PP\n");
 %%
 
+/* 
+ * Starting point. Parse arguments. You know the drill.
+ */
 int main(int argc, char *argv[])
 {
-	char *file;
+	char *file = NULL;
 
+	print_head();
 
 	++argv, --argc;
 	if (argc > 0) {
 		for (int i = 0; i < argc; i++) {
 			if (*argv[i] == '-' && strlen(argv[i]) > 1) {
-				for (int j = 1; j < strlen(argv[i]); j++) {
-					switch (argv[i][j]) {
+				if (strlen(argv[i]) > 2) {
+					for (int j = 1; j < strlen(argv[i]); j++) {
+						switch (argv[i][j]) {
+							case 'b': /* break front page */
+								printf(".RP no\n");
+								break;
+							case 'n': /* no date display */
+								printf(".ND \"\"\n");
+								break;
+							default:
+								usage();
+						}
+					}
+				} else {
+					switch (argv[i][1]) {
 						case 't': /* set title */
 							printf(".TL\n%s\n", argv[++i]);
 							break;
 						case 'a': /* set author */
 							printf(".AU\n%s\n", argv[++i]);
 							break;
-						case 'b': /* break front page */
-							printf(".RP no\n");
-							break;
-						case 'n': /* no date display */
-							printf(".ND \"\"\n");
-							break;
 						default:
-							fprintf(stderr, "usage: md2roff [-bn] [-t title] [-a author] [file...]\n");
-							exit(EXIT_FAILURE);
+							usage();
 					}
 				}
 			} else {
@@ -79,6 +93,10 @@ int main(int argc, char *argv[])
 		}
 		printf(".fp 8 C\n");
 		yyin = fopen(file, "r");
+		if (!yyin) {
+			fprintf(stderr, "error: can't open input file\n");
+			exit(EXIT_FAILURE);
+		}
 		yylex();
 	} else {
 		printf(".fp 8 C\n");
@@ -89,6 +107,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+/*
+ * Process stuff at the start of the line in Markdown (#, ##, *, etc).
+ */
 void do_pre(char *text, int type)
 {
 	switch (type) {
@@ -103,6 +124,9 @@ void do_pre(char *text, int type)
 	printf("\n");
 }
 
+/* 
+ * Process stuff that surrounds the line in Markdown (**bold**, *italic*, etc).
+ */
 void do_surround(char *text, int type)
 {
 	switch (type) {
@@ -111,11 +135,23 @@ void do_surround(char *text, int type)
 		case SUR_I: printf("\n.I \"%s\"\n", strip_surround(text, 1)); break;
 		case SUR_UL: printf("\n.UL \"%s\"", strip_surround(text, 2)); break;
 		case SUR_M: printf("\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
-		default: fprintf(stderr, "error: unimplemented\n");
+		default: fprintf(stderr, "warning: unimplemented\n");
 	}
 	printf("\n");
 }
 
+/*
+ * Print necessary stuff at the start of the output roff source.
+ */
+void print_head(void)
+{
+	/* monospace font necessary for code */
+	printf(".fp 8 CW\n");
+}
+
+/*
+ * Strip whitespace (spaces and tabs) off a line.
+ */
 char *strip_whitespace(char *str)
 {
 	int i;
@@ -126,8 +162,21 @@ char *strip_whitespace(char *str)
 	return "";
 }
 
+/* 
+ * Strip surrounding chars from a given length ("_example*" with len 1
+ * becomes "example").
+ */
 char *strip_surround(char *str, int len)
 {
 	str[strlen(str) - len] = '\0';
 	return strip_whitespace(&str[len]);
+}
+
+/* 
+ * Print program usage and quit with an error status.
+ */
+void usage(void)
+{
+	fprintf(stderr, "usage: md2roff [-bn] [-t title] [-a author] [file]\n");
+	exit(EXIT_FAILURE);
 }
