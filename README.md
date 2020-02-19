@@ -13,7 +13,7 @@
 
 ## How?? (Part 2) (for UNIX noobs using groff)
 
-`| ./md2roff markdown.md | groff -ms -Tpdf >output.pdf`
+`./md2roff markdown.md | groff -ms -Tpdf >output.pdf`
 
 ## How?? (Part 2) (for UNIX chads using Heirloom Doctools)
 
