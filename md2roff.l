@@ -92,7 +92,11 @@ int main(int argc, char *argv[])
 			}
 		}
 		printf(".fp 8 C\n");
-		yyin = fopen(file, "r");
+		if (file == NULL) {
+			yyin = stdin;
+		} else {
+			yyin = fopen(file, "r");
+		}
 		if (!yyin) {
 			fprintf(stderr, "error: can't open input file\n");
 			exit(EXIT_FAILURE);
@@ -100,7 +104,6 @@ int main(int argc, char *argv[])
 		yylex();
 	} else {
 		printf(".fp 8 C\n");
-		yyin = fopen(file, "r");
 		yyin = stdin;
 		yylex();
 	}
