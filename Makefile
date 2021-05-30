@@ -18,8 +18,10 @@ clean:
 	rm -f md2roff lex.yy.o lex.yy.c
 
 install:
-	cp md2roff $(PREFIX)/bin/md2roff
-	cp md2roff.1 $(MANPREFIX)/man1/md2roff.1
+	cp md2roff $(PREFIX)/bin
+	cp md2roff.1 ${DESTDIR}${MANPREFIX}/man1
+	chmod 755 ${DESTDIR}${PREFIX}/bin/md2roff
+	chmod 644 ${DESTDIR}${MANPREFIX}/man1/md2roff.1
 
 uninstall:
 	rm -f $(PREFIX)/bin/md2roff $(MANPREFIX)/man1/md2roff.1
