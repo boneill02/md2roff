@@ -27,5 +27,7 @@ dependencies so I decided to write my own alternative.
 
 ## License
 
-Copyright (C) 2019-2021 Ben O'Neill <ben@benoneill.xyz>. Licensed under
-the GNU GPL v3.
+Copyright (C) 2019-2021 Ben O'Neill <ben@benoneill.xyz>. License: GNU
+GPL Version 3 <https://gnu.org/licenses/gpl.html>. This is free
+software: you are free to change and redistribute it. There is NO
+WARRANTY, to the extent permitted by law.
