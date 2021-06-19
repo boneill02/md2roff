@@ -24,3 +24,8 @@
 Pandoc can do the same I think but it is written in Haskell and I don't use
 any Haskell programs so I tried to install Pandoc and it had too many
 dependencies so I decided to write my own alternative.
+
+## License
+
+Copyright (C) 2019-2021 Ben O'Neill <ben@benoneill.xyz>. Licensed under
+the GNU GPL v3.
