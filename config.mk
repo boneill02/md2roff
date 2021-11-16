@@ -9,4 +9,4 @@ LDFLAGS  = -s
 # compiler and linker
 CC = cc
 
-LEX = flex
+LEX = lex
