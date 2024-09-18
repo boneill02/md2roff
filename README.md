@@ -2,28 +2,22 @@
 
 ## Prerequisites
 
-* A lex (I used flex, should be pretty portable though)
+* A lex (tested with flex, should be pretty portable though)
 * GNU Make
 * A C99 compiler (I used GCC)
 
-## How??
+## How to use
 
 * `make` it
-* Pipe your Markdown input to `md2roff`
+* Pipe your Markdown input to `md2roff`, examples below:
 
-## How?? (Part 2) (for UNIX noobs using groff)
+```
+# Using groff
+./md2roff markdown.md | groff -ms -Tpdf >output.pdf`
 
-`./md2roff markdown.md | groff -ms -Tpdf >output.pdf`
-
-## How?? (Part 2) (for UNIX chads using Heirloom Doctools)
-
+# Using heirloom doctools or similar
 `./md2roff markdown.md | troff -ms | dpost >output.ps`
-
-## Why??
-
-Pandoc can do the same I think but it is written in Haskell and I don't use
-any Haskell programs so I tried to install Pandoc and it had too many
-dependencies so I decided to write my own alternative.
+```
 
 ## License
 
