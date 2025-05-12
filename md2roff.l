@@ -1,9 +1,7 @@
 %{
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #define FLAG_CONVERT_TO_PDF 0x1
 #define FLAG_BREAK_FRONT_PAGE 0x2
@@ -12,7 +10,7 @@
 void do_pre(char *, int);
 void do_surround(char *, int);
 FILE *open_file(const char *, const char *);
-void parse_args(int, char **);
+int parse_args(int, char **);
 void print_head(void);
 char *strip_surround(char *, int);
 char *strip_whitespace(char *);
@@ -37,7 +35,6 @@ enum {
 typedef struct md2roff_args_s {
 	FILE *input;
 	FILE *output;
-	char *output_path;
 	char *title;
 	char *author;
 	uint8_t flags;
@@ -98,20 +95,18 @@ void do_surround(char *text, int type)
 	fprintf(args.output, "\n");
 }
 
-FILE *open_file(const char *path, const char *flags) {
+FILE *open_file(const char *path, const char *flags)
+{
 	FILE *f = fopen(path, flags);
 	if (!f) {
-		fprintf(stderr, "Error: Can't open file at path %s with flags %s\n", path, flags);
+		fprintf(stderr, "Error: Can't open file at path %s\n", path);
 		exit(EXIT_FAILURE);
 	}
 	return f;
 }
 
-void parse_args(int argc, char *argv[]) {
+int parse_args(int argc, char **argv) {
 	int opt;
-
-	args.input = stdin;
-	args.output = stdout;
 	while ((opt = getopt(argc, argv, "a:bno:pt:")) != -1) {
 		switch (opt) {
 			case 'b':
@@ -121,7 +116,7 @@ void parse_args(int argc, char *argv[]) {
 				args.flags |= FLAG_NO_DATE_DISPLAY;
 				break;
 			case 'o':
-				args.output_path = optarg;
+				args.output = open_file(argv[optind], "w");
 				break;
 			case 'p':
 				args.flags |= FLAG_CONVERT_TO_PDF;
@@ -134,12 +129,19 @@ void parse_args(int argc, char *argv[]) {
 				break;
 			default:
 				usage();
+				return 1;
 		}
+	}
+
+	if (args.output != stdin && args.flags & FLAG_CONVERT_TO_PDF) {
+		fprintf(stderr, "Error: Cannot set output file when converting to PDF\n");
+		return 1;
 	}
 
 	if (optind < argc) {
 		args.input = open_file(argv[optind], "r");
 	}
+	return 0;
 }
 
 void print_head()
@@ -189,41 +191,25 @@ char *strip_surround(char *str, int len)
 void usage(void)
 {
 	fprintf(stderr, "usage: md2roff [-bnp] [-t title] [-a author] [-o output] [file]\n");
-	exit(EXIT_FAILURE);
 }
 
 int main(int argc, char *argv[])
 {
-	FILE *pipe = NULL;
-	parse_args(argc, argv);
+	yyin = stdin;
+	args.input = stdin;
+	args.output = stdout;
+	args.flags = 0;
 
-	if (args.flags & FLAG_CONVERT_TO_PDF) {
-		const char *command = "groff -ms -Tpdf";
-		if (args.output_path) {
-			char commandstr[64];
-			sprintf(commandstr, "%s -o %s", command, args.output_path); // TODO could be segfault here
-			pipe = popen(commandstr, "w");
-		} else {
-			pipe = popen(command, "w");
-		}
-		yyout = pipe;
-	} else if (args.output_path) {
-		args.output = open_file(args.output_path, "w");
+	if (!parse_args(argc, argv)) {
+		print_head();
+		yylex();
 	}
-
-	yyin = args.input;
-	yyout = args.output;
-	print_head();
-	yylex();
 
 	if (args.input != stdin) {
 		fclose(args.input);
 	}
 	if (args.output != stdout) {
 		fclose(args.output);
-	}
-	if (pipe) {
-		pclose(pipe);
 	}
 	return 0;
 }
