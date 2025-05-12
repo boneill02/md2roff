@@ -79,7 +79,7 @@ void do_pre(char *text, int type)
 		case PRE_IP:  fprintf(args.output, ".IP -"); break;
 		default: fprintf(stderr, "Warning: Unimplemented syntax at line %d\n", yylineno);
 	}
-	printf("\n");
+	fprintf(args.output, "\n");
 }
 
 /* 
@@ -93,9 +93,9 @@ void do_surround(char *text, int type)
 		case SUR_I: fprintf(args.output, "\n.I \"%s\"\n", strip_surround(text, 1)); break;
 		case SUR_UL: fprintf(args.output, "\n.UL \"%s\"", strip_surround(text, 2)); break;
 		case SUR_M: fprintf(args.output, "\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
-		default: fprintf(stderr, "Warning: Unimplemented\n");
+		default: fprintf(stderr, "Warning: Unimplemented syntax at line %d\n", yylineno);
 	}
-	printf("\n");
+	fprintf(args.output, "\n");
 }
 
 FILE *open_file(const char *path, const char *flags) {
