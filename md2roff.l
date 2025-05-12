@@ -47,6 +47,7 @@ md2roff_args_t args;
 
 %option noyywrap
 %option yylineno
+%option no
 STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 
 %%
@@ -61,7 +62,7 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 "*"{STRING}+"*" do_surround(yytext, SUR_I);
 "__"{STRING}+"__" do_surround(yytext, SUR_UL);
 "`"{STRING}+"`" do_surround(yytext, SUR_M);
-"\n\n" printf("\n.PP\n");
+"\n\n" fprintf(args.output, "\n.PP\n");
 %%
 
 /*
@@ -108,6 +109,9 @@ FILE *open_file(const char *path, const char *flags) {
 
 void parse_args(int argc, char *argv[]) {
 	int opt;
+
+	args.input = stdin;
+	args.output = stdout;
 	while ((opt = getopt(argc, argv, "bnopt:a:")) != -1) {
 		switch (opt) {
 			case 'b':
@@ -135,14 +139,13 @@ void parse_args(int argc, char *argv[]) {
 
 	if (optind < argc) {
 		args.input = open_file(argv[optind], "r");
-	} else {
-		args.input = stdin;
 	}
 }
 
 void print_head()
 {
 	fprintf(args.output, ".fp 8 CW\n");
+	return ;
 	if (args.flags & FLAG_BREAK_FRONT_PAGE) {
 		fprintf(args.output, ".RP no\n");
 	}
