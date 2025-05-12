@@ -190,7 +190,7 @@ char *strip_surround(char *str, int len)
  */
 void usage(void)
 {
-	fprintf(stderr, "usage: md2roff [-bnp] [-t title] [-a author] [-o output] [file]\n");
+	fprintf(stderr, "usage: md2roff [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]\n");
 }
 
 int main(int argc, char *argv[])
