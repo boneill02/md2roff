@@ -101,7 +101,7 @@ void do_surround(char *text, int type)
 FILE *open_file(const char *path, const char *flags) {
 	FILE *f = fopen(path, flags);
 	if (!f) {
-		fprintf(stderr, "Error: Can't open file at path %s\n", path);
+		fprintf(stderr, "Error: Can't open file at path %s with flags %s\n", path, flags);
 		exit(EXIT_FAILURE);
 	}
 	return f;
@@ -112,7 +112,7 @@ void parse_args(int argc, char *argv[]) {
 
 	args.input = stdin;
 	args.output = stdout;
-	while ((opt = getopt(argc, argv, "bnopt:a:")) != -1) {
+	while ((opt = getopt(argc, argv, "a:bno:pt:")) != -1) {
 		switch (opt) {
 			case 'b':
 				args.flags |= FLAG_BREAK_FRONT_PAGE;
@@ -158,7 +158,6 @@ void print_head()
 	if (args.author) {
 		fprintf(args.output, ".AU\n%s\n", args.title);
 	}
-
 }
 
 /*
@@ -209,7 +208,7 @@ int main(int argc, char *argv[])
 		}
 		yyout = pipe;
 	} else if (args.output_path) {
-		args.output = open_file(args.output_path, "rw");
+		args.output = open_file(args.output_path, "w");
 	}
 
 	yyin = args.input;
