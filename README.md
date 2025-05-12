@@ -4,7 +4,7 @@
 
 * A lex (tested with flex, should be pretty portable though)
 * GNU Make
-* A C99 compiler (I used GCC)
+* A C compiler (I used GCC)
 
 ## How to use
 
@@ -21,5 +21,5 @@
 
 ## License
 
-Copyright (C) 2019-2021 Ben O'Neill <ben@oneill.sh>. License: MIT.
+Copyright (C) 2019-2025 Ben O'Neill <ben@oneill.sh>. License: MIT.
 See LICENSE for more details.
