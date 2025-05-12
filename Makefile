@@ -17,7 +17,7 @@ lex.yy.o: lex.yy.c
 clean:
 	rm -f md2roff lex.yy.o lex.yy.c
 
-install:
+install: md2roff
 	cp md2roff $(PREFIX)/bin
 	cp md2roff.1 ${DESTDIR}${MANPREFIX}/man1
 	chmod 755 ${DESTDIR}${PREFIX}/bin/md2roff
