@@ -1,5 +1,7 @@
 # md2roff
 
+`md2roff` converts Markdown to roff source, using MS macros. This is useful for converting Markdown files to printable PDFs.
+
 ## Prerequisites
 
 * A lex (tested with flex, should be pretty portable though)
@@ -8,15 +10,25 @@
 
 ## How to use
 
-* `make` it
-* Pipe your Markdown input to `md2roff`, examples below:
+Usage: `md2roff [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]`
+
+### Options
+
+* `-b`: Disable page break between the title page and contents.
+* `-n`: Disable display of the current date.
+* `-p`: Convert to a PDF using groff.
+* `-t title`: Set the document title.
+* `-a author`: Set the document author.
+* `-o outputfile`: Set the output file.
+
+### Examples
 
 ```
-# Using groff
-./md2roff markdown.md | groff -ms -Tpdf >output.pdf`
+# Convert to postscript
+md2roff -t "My File" mymarkdown.md | groff -ms -Tps >myps.ps
 
-# Using heirloom doctools or similar
-`./md2roff markdown.md | troff -ms | dpost >output.ps`
+# Convert to PDF
+md2roff -p -t "My File" mymarkdown.md >mypdf.pdf
 ```
 
 ## License
