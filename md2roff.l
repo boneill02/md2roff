@@ -1,13 +1,21 @@
 %{
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-void do_pre(char *text, int type);
-void do_surround(char *text, int type);
+#include <unistd.h>
 
+#define FLAG_CONVERT_TO_PDF 0x1
+#define FLAG_BREAK_FRONT_PAGE 0x2
+#define FLAG_NO_DATE_DISPLAY 0x4
+
+void do_pre(char *, int);
+void do_surround(char *, int);
+FILE *open_file(const char *, const char *);
+void parse_args(int, char **);
 void print_head(void);
-
-char *strip_surround(char *str, int len);
-char *strip_whitespace(char *str);
+char *strip_surround(char *, int);
+char *strip_whitespace(char *);
 
 void usage(void);
 
@@ -19,19 +27,26 @@ enum {
 	PRE_SH4,
 	PRE_SH5,
 	PRE_IP,
-};
-
-enum {
 	SUR_BI,
 	SUR_B,
 	SUR_I,
 	SUR_UL,
-	SUR_M,
+	SUR_M
 };
+
+typedef struct md2roff_args_s {
+	FILE *input;
+	FILE *output;
+	char *output_path;
+	char *title;
+	char *author;
+	uint8_t flags;
+} md2roff_args_t;
+md2roff_args_t args;
 %}
 
 %option noyywrap
-%option no
+%option yylineno
 STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 
 %%
@@ -49,80 +64,19 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 "\n\n" printf("\n.PP\n");
 %%
 
-/* 
- * Starting point. Parse arguments. You know the drill.
- */
-int main(int argc, char *argv[])
-{
-	char *file = NULL;
-
-	print_head();
-
-	++argv, --argc;
-	if (argc > 0) {
-		for (int i = 0; i < argc; i++) {
-			if (*argv[i] == '-' && strlen(argv[i]) > 1) {
-				if (strlen(argv[i]) > 2) {
-					for (int j = 1; j < strlen(argv[i]); j++) {
-						switch (argv[i][j]) {
-							case 'b': /* break front page */
-								printf(".RP no\n");
-								break;
-							case 'n': /* no date display */
-								printf(".ND \"\"\n");
-								break;
-							default:
-								usage();
-						}
-					}
-				} else {
-					switch (argv[i][1]) {
-						case 't': /* set title */
-							printf(".TL\n%s\n", argv[++i]);
-							break;
-						case 'a': /* set author */
-							printf(".AU\n%s\n", argv[++i]);
-							break;
-						default:
-							usage();
-					}
-				}
-			} else {
-				file = argv[i];
-			}
-		}
-		printf(".fp 8 C\n");
-		if (file == NULL) {
-			yyin = stdin;
-		} else {
-			yyin = fopen(file, "r");
-		}
-		if (!yyin) {
-			fprintf(stderr, "error: can't open input file\n");
-			exit(EXIT_FAILURE);
-		}
-		yylex();
-	} else {
-		printf(".fp 8 C\n");
-		yyin = stdin;
-		yylex();
-	}
-	return 0;
-}
-
 /*
  * Process stuff at the start of the line in Markdown (#, ##, *, etc).
  */
 void do_pre(char *text, int type)
 {
 	switch (type) {
-		case PRE_SH1: printf(".NH 1\n%s\n.PP", strip_whitespace(&text[2])); break;
-		case PRE_SH2: printf(".NH 2\n%s\n.PP", strip_whitespace(&text[3])); break;
-		case PRE_SH3: printf(".NH 3\n%s\n.PP", strip_whitespace(&text[4])); break;
-		case PRE_SH4: printf(".NH 4\n%s\n.PP", strip_whitespace(&text[5])); break;
-		case PRE_SH5: printf(".NH 5\n%s\n.PP", strip_whitespace(&text[6])); break;
-		case PRE_IP:  printf(".IP -"); break;
-		default: fprintf(stderr, "error: unimplemented\n");
+		case PRE_SH1: fprintf(args.output, ".NH 1\n%s\n.PP", strip_whitespace(&text[2])); break;
+		case PRE_SH2: fprintf(args.output, ".NH 2\n%s\n.PP", strip_whitespace(&text[3])); break;
+		case PRE_SH3: fprintf(args.output, ".NH 3\n%s\n.PP", strip_whitespace(&text[4])); break;
+		case PRE_SH4: fprintf(args.output, ".NH 4\n%s\n.PP", strip_whitespace(&text[5])); break;
+		case PRE_SH5: fprintf(args.output, ".NH 5\n%s\n.PP", strip_whitespace(&text[6])); break;
+		case PRE_IP:  fprintf(args.output, ".IP -"); break;
+		default: fprintf(stderr, "Warning: Unimplemented syntax at line %d\n", yylineno);
 	}
 	printf("\n");
 }
@@ -133,23 +87,75 @@ void do_pre(char *text, int type)
 void do_surround(char *text, int type)
 {
 	switch (type) {
-		case SUR_BI: printf(".B\n.I\n%s\n.R", strip_surround(text, 3)); break;
-		case SUR_B: printf("\n.B \"%s\"", strip_surround(text, 2)); break;
-		case SUR_I: printf("\n.I \"%s\"\n", strip_surround(text, 1)); break;
-		case SUR_UL: printf("\n.UL \"%s\"", strip_surround(text, 2)); break;
-		case SUR_M: printf("\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
-		default: fprintf(stderr, "warning: unimplemented\n");
+		case SUR_BI: fprintf(args.output, ".B\n.I\n%s\n.R", strip_surround(text, 3)); break;
+		case SUR_B: fprintf(args.output, "\n.B \"%s\"", strip_surround(text, 2)); break;
+		case SUR_I: fprintf(args.output, "\n.I \"%s\"\n", strip_surround(text, 1)); break;
+		case SUR_UL: fprintf(args.output, "\n.UL \"%s\"", strip_surround(text, 2)); break;
+		case SUR_M: fprintf(args.output, "\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
+		default: fprintf(stderr, "Warning: Unimplemented\n");
 	}
 	printf("\n");
 }
 
-/*
- * Print necessary stuff at the start of the output roff source.
- */
-void print_head(void)
+FILE *open_file(const char *path, const char *flags) {
+	FILE *f = fopen(path, flags);
+	if (!f) {
+		fprintf(stderr, "Error: Can't open file at path %s\n", path);
+		exit(EXIT_FAILURE);
+	}
+	return f;
+}
+
+void parse_args(int argc, char *argv[]) {
+	int opt;
+	while ((opt = getopt(argc, argv, "bnopt:a:")) != -1) {
+		switch (opt) {
+			case 'b':
+				args.flags |= FLAG_BREAK_FRONT_PAGE;
+				break;
+			case 'n':
+				args.flags |= FLAG_NO_DATE_DISPLAY;
+				break;
+			case 'o':
+				args.output_path = optarg;
+				break;
+			case 'p':
+				args.flags |= FLAG_CONVERT_TO_PDF;
+				break;
+			case 't':
+				args.title = optarg;
+				break;
+			case 'a':
+				args.author = optarg;
+				break;
+			default:
+				usage();
+		}
+	}
+
+	if (optind < argc) {
+		args.input = open_file(argv[optind], "r");
+	} else {
+		args.input = stdin;
+	}
+}
+
+void print_head()
 {
-	/* monospace font necessary for code */
-	printf(".fp 8 CW\n");
+	fprintf(args.output, ".fp 8 CW\n");
+	if (args.flags & FLAG_BREAK_FRONT_PAGE) {
+		fprintf(args.output, ".RP no\n");
+	}
+	if (args.flags & FLAG_NO_DATE_DISPLAY) {
+		fprintf(args.output, ".ND \"\"\n");
+	}
+	if (args.title) {
+		fprintf(args.output, ".TL \n%s\n", args.title);
+	}
+	if (args.author) {
+		fprintf(args.output, ".AU\n%s\n", args.title);
+	}
+
 }
 
 /*
@@ -162,7 +168,7 @@ char *strip_whitespace(char *str)
 		if (str[i] != ' ' && str[i] != '\t')
 			return &str[i];
 	}
-	return "";
+	return NULL;
 }
 
 /* 
@@ -175,11 +181,47 @@ char *strip_surround(char *str, int len)
 	return strip_whitespace(&str[len]);
 }
 
-/* 
+/*
  * Print program usage and quit with an error status.
  */
 void usage(void)
 {
-	fprintf(stderr, "usage: md2roff [-bn] [-t title] [-a author] [file]\n");
+	fprintf(stderr, "usage: md2roff [-bnp] [-t title] [-a author] [-o output] [file]\n");
 	exit(EXIT_FAILURE);
+}
+
+int main(int argc, char *argv[])
+{
+	FILE *pipe = NULL;
+	parse_args(argc, argv);
+
+	if (args.flags & FLAG_CONVERT_TO_PDF) {
+		const char *command = "groff -ms -Tpdf";
+		if (args.output_path) {
+			char commandstr[64];
+			sprintf(commandstr, "%s -o %s", command, args.output_path); // TODO could be segfault here
+			pipe = popen(commandstr, "w");
+		} else {
+			pipe = popen(command, "w");
+		}
+		yyout = pipe;
+	} else if (args.output_path) {
+		args.output = open_file(args.output_path, "rw");
+	}
+
+	yyin = args.input;
+	yyout = args.output;
+	print_head();
+	yylex();
+
+	if (args.input != stdin) {
+		fclose(args.input);
+	}
+	if (args.output != stdout) {
+		fclose(args.output);
+	}
+	if (pipe) {
+		pclose(pipe);
+	}
+	return 0;
 }
