@@ -26,7 +26,4 @@ install: md2roff
 uninstall:
 	rm -f $(PREFIX)/bin/md2roff $(MANPREFIX)/man1/md2roff.1
 
-test: md2roff
-	sh test.sh
-
-.PHONY: all clean
+.PHONY: all clean install uninstall
