@@ -8,9 +8,11 @@
 * GNU Make
 * A C compiler (I used GCC)
 
-## How to use
+## Usage
 
-Usage: `md2roff [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]`
+```
+md2roff [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]
+```
 
 ### Options
 
