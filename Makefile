@@ -19,7 +19,7 @@ src/util.o: src/util.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 clean:
-	rm -f md2ms md2man src/*lex.yy.o src/*lex.yy.c src/util.o
+	rm -f md2ms md2man md2roff src/*lex.yy.o src/*lex.yy.c src/util.o
 
 install: md2ms md2man md2roff
 	cp md2roff md2ms md2man $(PREFIX)/bin
