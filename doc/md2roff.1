@@ -1,0 +1,29 @@
+.TH MD2ROFF 1 "May 2025" "md2roff" "User Commands"
+.SH NAME
+md2roff \- convert Markdown text to roff
+.SH SYNOPSIS
+.B md2man
+format [options]
+.SH DESCRIPTION
+\fBmd2roff\fR is a wrapper for \fBmd2man\fR and \fBmd2ms\fR. Arguments passed
+to \fBmd2roff\fR beyond the format argument are sent to the corresponding
+translator.
+.SH USAGE
+.TP
+.B -ms
+Convert to roff ms macros (see \fBmd2ms(1)\fR for options)
+.TP
+.B -man
+Convert to roff man macros (see \fBmd2man(1)\fR for options)
+.SH AUTHOR
+Written by Ben O'Neill <ben@oneill.sh>.
+.SH BUGS
+If any bugs are found, email the author.
+.SH COPYRIGHT
+Copyright \(co 2019-2025 Ben O'Neill <ben@oneill.sh>. License: MIT.
+.SH SEE ALSO
+.BR md2ms (1),
+.BR md2man (1),
+.BR groff (1),
+.BR groff_man (7),
+.BR groff_ms (7)

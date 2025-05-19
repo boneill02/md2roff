@@ -1,13 +1,13 @@
-.TH MD2ROFF 1 "February 2020" "md2roff" "User Commands"
+.TH MD2MS 1 "February 2020" "md2ms" "User Commands"
 .SH NAME
-md2roff \- convert Markdown text to roff with MS macros
+md2ms \- convert Markdown text to roff ms macros
 .SH SYNOPSIS
-.B md2roff
+.B md2ms
 [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]
 .SH DESCRIPTION
-md2roff converts the Markdown input in the given file to roff using the MS
-macros. If no file is given, md2roff will read from standard input. The
-resulting roff source is always outputted to standard output.
+md2ms converts the Markdown input in the given file to roff using the ms
+macros. If no input or output files are given, md2ms will use stdin and stdout,
+respectively.
 .SH USAGE
 .TP
 .B -b
@@ -34,6 +34,7 @@ If any bugs are found, email the author.
 .SH COPYRIGHT
 Copyright \(co 2019-2025 Ben O'Neill <ben@oneill.sh>. License: MIT.
 .SH SEE ALSO
+.BR md2man (1),
+.BR md2roff (1),
 .BR groff (1),
-.BR troff (1),
 .BR groff_ms (7)

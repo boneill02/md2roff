@@ -1,0 +1,31 @@
+.TH MD2MAN 1 "May 2025" "md2ms" "User Commands"
+.SH NAME
+md2man \- convert Markdown text to a manpage
+.SH SYNOPSIS
+.B md2man
+[-p] [-t title] [-o outputfile] [inputfile]
+.SH DESCRIPTION
+md2man converts the Markdown input in the given file to roff using the \fBman\fR
+macros. If no input or output files are given, md2man will use stdin and stdout,
+respectively.
+.SH USAGE
+.TP
+.B -t title
+Set the document header (.TH tag).
+.TP
+.B -o output
+Set the output file (unable to be used with \fB-p\fR).
+.TP
+.B -p
+Automatically pipes the output to \fBgroff -ms -Tpdf\fR.
+.SH AUTHOR
+Written by Ben O'Neill <ben@oneill.sh>.
+.SH BUGS
+If any bugs are found, email the author.
+.SH COPYRIGHT
+Copyright \(co 2019-2025 Ben O'Neill <ben@oneill.sh>. License: MIT.
+.SH SEE ALSO
+.BR md2ms (1),
+.BR md2roff (1),
+.BR groff (1),
+.BR groff_man (7)

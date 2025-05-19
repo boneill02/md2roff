@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "util.h"
+
 #define FLAG_CONVERT_TO_PDF 0x1
 #define FLAG_BREAK_FRONT_PAGE 0x2
 #define FLAG_NO_DATE_DISPLAY 0x4
@@ -12,10 +14,8 @@ void do_surround(char *, int);
 FILE *open_file(const char *, const char *);
 int parse_args(int, char **);
 void print_head(void);
-char *strip_surround(char *, int);
-char *strip_whitespace(char *);
 
-void usage(void);
+void usage(char *argv0);
 
 enum {
 	PRE_TL,
@@ -53,7 +53,7 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 "### "{STRING}+"\n" do_pre(yytext, PRE_SH3);
 "#### "{STRING}+"\n" do_pre(yytext, PRE_SH4);
 "##### "{STRING}+"\n" do_pre(yytext, PRE_SH5);
-"* " do_pre(yytext, PRE_IP);
+"\n* " do_pre(yytext, PRE_IP);
 "***"{STRING}+"***" do_surround(yytext, SUR_BI);
 "**"{STRING}+"**" do_surround(yytext, SUR_B);
 "*"{STRING}+"*" do_surround(yytext, SUR_I);
@@ -62,45 +62,27 @@ STRING [a-zA-Z0-9!@#$%^&(),.?/\\\-<>|\{\}\[\]\"\' \t]
 "\n\n" fprintf(args.output, "\n.PP\n");
 %%
 
-/*
- * Process stuff at the start of the line in Markdown (#, ##, *, etc).
- */
-void do_pre(char *text, int type)
-{
+void do_pre(char *text, int type) {
 	switch (type) {
 		case PRE_SH1: fprintf(args.output, ".NH 1\n%s\n.PP", strip_whitespace(&text[2])); break;
 		case PRE_SH2: fprintf(args.output, ".NH 2\n%s\n.PP", strip_whitespace(&text[3])); break;
 		case PRE_SH3: fprintf(args.output, ".NH 3\n%s\n.PP", strip_whitespace(&text[4])); break;
 		case PRE_SH4: fprintf(args.output, ".NH 4\n%s\n.PP", strip_whitespace(&text[5])); break;
 		case PRE_SH5: fprintf(args.output, ".NH 5\n%s\n.PP", strip_whitespace(&text[6])); break;
-		case PRE_IP:  fprintf(args.output, ".IP -"); break;
+		case PRE_IP:  fprintf(args.output, ".IP - \n"); break;
 	}
 	fprintf(args.output, "\n");
 }
 
-/* 
- * Process stuff that surrounds the line in Markdown (**bold**, *italic*, etc).
- */
-void do_surround(char *text, int type)
-{
+void do_surround(char *text, int type) {
 	switch (type) {
-		case SUR_BI: fprintf(args.output, ".B\n.I\n%s\n.R", strip_surround(text, 3)); break;
-		case SUR_B: fprintf(args.output, "\n.B \"%s\"", strip_surround(text, 2)); break;
-		case SUR_I: fprintf(args.output, "\n.I \"%s\"\n", strip_surround(text, 1)); break;
-		case SUR_UL: fprintf(args.output, "\n.UL \"%s\"", strip_surround(text, 2)); break;
+		case SUR_BI: fprintf(args.output, "\\fB\\fI%s\\fR", strip_surround(text, 3)); break;
+		case SUR_B: fprintf(args.output, "\\fB%s\\fR", strip_surround(text, 2)); break;
+		case SUR_I: fprintf(args.output, "\\fI%s\\fR", strip_surround(text, 1)); break;
+		case SUR_UL: fprintf(args.output, ".UL\n%s\n.R", strip_surround(text, 2)); break;
 		case SUR_M: fprintf(args.output, "\n.ft 8\n%s\n.R", strip_surround(text, 1)); break;
 	}
 	fprintf(args.output, "\n");
-}
-
-FILE *open_file(const char *path, const char *flags)
-{
-	FILE *f = fopen(path, flags);
-	if (!f) {
-		fprintf(stderr, "Error: Can't open file at path %s\n", path);
-		exit(EXIT_FAILURE);
-	}
-	return f;
 }
 
 int parse_args(int argc, char **argv) {
@@ -126,7 +108,7 @@ int parse_args(int argc, char **argv) {
 				args.author = optarg;
 				break;
 			default:
-				usage();
+				usage(argv[0]);
 				return 1;
 		}
 	}
@@ -142,8 +124,7 @@ int parse_args(int argc, char **argv) {
 	return 0;
 }
 
-void print_head()
-{
+void print_head() {
 	fprintf(args.output, ".fp 8 CW\n");
 	return ;
 	if (args.flags & FLAG_BREAK_FRONT_PAGE) {
@@ -160,39 +141,11 @@ void print_head()
 	}
 }
 
-/*
- * Strip whitespace (spaces and tabs) off a line.
- */
-char *strip_whitespace(char *str)
-{
-	int i;
-	for (i = 0; i < strlen(str); i++) {
-		if (str[i] != ' ' && str[i] != '\t')
-			return &str[i];
-	}
-	return NULL;
+void usage(char *argv0) {
+	fprintf(stderr, "Usage: %s [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]\n", argv0);
 }
 
-/* 
- * Strip surrounding chars from a given length ("_example*" with len 1
- * becomes "example").
- */
-char *strip_surround(char *str, int len)
-{
-	str[strlen(str) - len] = '\0';
-	return strip_whitespace(&str[len]);
-}
-
-/*
- * Print program usage and quit with an error status.
- */
-void usage(void)
-{
-	fprintf(stderr, "usage: md2roff [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]\n");
-}
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	yyin = stdin;
 	args.input = stdin;
 	args.output = stdout;
@@ -200,6 +153,7 @@ int main(int argc, char *argv[])
 
 	if (!parse_args(argc, argv)) {
 		print_head();
+		yyin = args.input;
 		yylex();
 	}
 

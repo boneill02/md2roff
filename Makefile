@@ -1,29 +1,39 @@
 include config.mk
 
-SRC = md2roff.l
-OBJ = lex.yy.o
+all: md2ms md2man md2roff
 
-all: md2roff
+md2roff:
+	$(CC) $(LDFLAGS) -o md2roff src/md2roff.c
 
-md2roff: $(OBJ)
-	$(CC) $(LDFLAGS) $(LIBS) -o $@ $(OBJ)
+md2ms: src/util.o
+	$(LEX) -o src/$@_lex.yy.c src/$@.l
+	$(CC) $(CFLAGS) -o src/$@_lex.yy.o -c src/$@_lex.yy.c
+	$(CC) $(LDFLAGS) $(LIBS) -o $@ src/$@_lex.yy.o $^
 
-lex.yy.c: md2roff.l
-	$(LEX) md2roff.l
+md2man: src/util.o
+	$(LEX) -o src/$@_lex.yy.c src/$@.l
+	$(CC) $(CFLAGS) -o src/$@_lex.yy.o -c src/$@_lex.yy.c
+	$(CC) $(LDFLAGS) $(LIBS) -o $@ src/$@_lex.yy.o $^
 
-lex.yy.o: lex.yy.c
+src/util.o: src/util.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 clean:
-	rm -f md2roff lex.yy.o lex.yy.c
+	rm -f md2ms md2man src/*lex.yy.o src/*lex.yy.c src/util.o
 
-install: md2roff
-	cp md2roff $(PREFIX)/bin
-	cp md2roff.1 ${DESTDIR}${MANPREFIX}/man1
-	chmod 755 ${DESTDIR}${PREFIX}/bin/md2roff
-	chmod 644 ${DESTDIR}${MANPREFIX}/man1/md2roff.1
+install: md2ms md2man md2roff
+	cp md2roff md2ms md2man $(PREFIX)/bin
+	cp doc/md2ms.1 doc/md2man.1 doc/md2roff.1 $(DESTDIR)$(MANPREFIX)/man1
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/md2roff
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/md2ms
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/md2man
+	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/md2roff.1
+	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/md2ms.1
+	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/md2man.1
 
 uninstall:
-	rm -f $(PREFIX)/bin/md2roff $(MANPREFIX)/man1/md2roff.1
+	rm -f $(PREFIX)/bin/md2roff $(PREFIX)/bin/md2ms $(PREFIX)/bin/md2man \
+		  $(MANPREFIX)/man1/md2roff.1 $(MANPREFIX)/man1/md2ms.1 \
+		  $(MANPREFIX)/man1/md2man.1
 
-.PHONY: all clean install uninstall
+.PHONY: all clean md2ms md2man md2roff install uninstall
