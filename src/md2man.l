@@ -108,7 +108,7 @@ void print_head() {
 }
 
 void usage(char *argv0) {
-	fprintf(stderr, "Usage: %s [-p] [-t title] [-o outputfile] [inputfile]\n", argv0);
+	fprintf(stderr, "Usage: %s [-t title] [-o outputfile] [inputfile]\n", argv0);
 }
 
 int main(int argc, char *argv[]) {

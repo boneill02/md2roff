@@ -5,7 +5,6 @@
 
 #include "util.h"
 
-#define FLAG_CONVERT_TO_PDF 0x1
 #define FLAG_BREAK_FRONT_PAGE 0x2
 #define FLAG_NO_DATE_DISPLAY 0x4
 
@@ -98,9 +97,6 @@ int parse_args(int argc, char **argv) {
 			case 'o':
 				args.output = open_file(argv[optind], "w");
 				break;
-			case 'p':
-				args.flags |= FLAG_CONVERT_TO_PDF;
-				break;
 			case 't':
 				args.title = optarg;
 				break;
@@ -111,11 +107,6 @@ int parse_args(int argc, char **argv) {
 				usage(argv[0]);
 				return 1;
 		}
-	}
-
-	if (args.output != stdin && args.flags & FLAG_CONVERT_TO_PDF) {
-		fprintf(stderr, "Error: Cannot set output file when converting to PDF\n");
-		return 1;
 	}
 
 	if (optind < argc) {
@@ -142,7 +133,7 @@ void print_head() {
 }
 
 void usage(char *argv0) {
-	fprintf(stderr, "Usage: %s [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]\n", argv0);
+	fprintf(stderr, "Usage: %s [-bn] [-t title] [-a author] [-o outputfile] [inputfile]\n", argv0);
 }
 
 int main(int argc, char *argv[]) {

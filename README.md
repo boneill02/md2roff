@@ -35,7 +35,6 @@ md2ms [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]
 
 * `-b`: Disable page break between the title page and contents.
 * `-n`: Disable display of the current date.
-* `-p`: Convert to a PDF using groff.
 * `-t title`: Set the document title.
 * `-a author`: Set the document author.
 * `-o outputfile`: Set the output file.
@@ -56,7 +55,7 @@ md2man [-t title] [-o outputfile] [inputfile]
 md2roff -ms -t "My File" mymarkdown.md | groff -ms -Tps >myps.ps
 
 # Convert to PDF
-md2roff -ms -p -t "My File" mymarkdown.md >mypdf.pdf
+md2roff -ms -t "My File" mymarkdown.md | groff -ms -Tpdf >mypdf.pdf
 
 # Convert to manpage
 md2roff -man -t 'MYMANPAGE 1 "May 2025" "mymanpage" "User Commands"' mymarkdown.md >mymanpage.1
