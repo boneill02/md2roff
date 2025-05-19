@@ -5,8 +5,6 @@
 
 #include "util.h"
 
-#define FLAG_CONVERT_TO_PDF 0x1
-
 void do_pre(char *, int);
 void do_surround(char *, int);
 FILE *open_file(const char *, const char *);
@@ -81,7 +79,7 @@ void do_surround(char *text, int type) {
 
 int parse_args(int argc, char **argv) {
 	int opt;
-	while ((opt = getopt(argc, argv, "o:pt:")) != -1) {
+	while ((opt = getopt(argc, argv, "o:t:")) != -1) {
 		switch (opt) {
 			case 'o':
 				args.output = open_file(argv[optind], "w");
