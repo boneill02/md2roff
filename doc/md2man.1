@@ -3,7 +3,7 @@
 md2man \- convert Markdown text to a manpage
 .SH SYNOPSIS
 .B md2man
-[-p] [-t title] [-o outputfile] [inputfile]
+[-t title] [-o outputfile] [inputfile]
 .SH DESCRIPTION
 md2man converts the Markdown input in the given file to roff using the \fBman\fR
 macros. If no input or output files are given, md2man will use stdin and stdout,
@@ -13,11 +13,8 @@ respectively.
 .B -t title
 Set the document header (.TH tag).
 .TP
-.B -o output
+.B -o outputfile
 Set the output file (unable to be used with \fB-p\fR).
-.TP
-.B -p
-Automatically pipes the output to \fBgroff -ms -Tpdf\fR.
 .SH AUTHOR
 Written by Ben O'Neill <ben@oneill.sh>.
 .SH BUGS
