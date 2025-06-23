@@ -22,7 +22,7 @@ Arguments for `md2ms` and `md2man` may be added as well. Input and output files
 are `stdin` and `stdout` by default.
 
 ```
-md2roff [-ms|-man] [args]
+md2roff [-ms|-man] [-t title] [-o outputfile] [args...] [inputfile]
 ```
 
 ## Options
@@ -30,7 +30,7 @@ md2roff [-ms|-man] [args]
 ### md2ms
 
 ```
-md2ms [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]
+md2ms [-bnp] [-a author] [-t tiitle] [-o outputfile] [inputfile]
 ```
 
 * `-b`: Disable page break between the title page and contents.
