@@ -1,3 +1,12 @@
+/*
+ * @file md2roff.c
+ * @brief wrapper for md2man and md2ms
+ * @author Ben O'Neill <ben@oneill.sh>
+ *
+ * @copyright Copyright (c) 2022-2025 Ben O'Neill <ben@oneill.sh>.
+ * This work is released under the terms of the MIT License. See
+ * LICENSE.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

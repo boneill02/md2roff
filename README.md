@@ -60,8 +60,11 @@ md2roff -ms -t "My File" mymarkdown.md | groff -ms -Tpdf >mypdf.pdf
 # Convert to manpage
 md2roff -man -t 'MYMANPAGE 1 "May 2025" "mymanpage" "User Commands"' mymarkdown.md >mymanpage.1
 ```
+## Bugs
+
+If you find a bug, submit an issue, PR, or email me with a description and/or patch.
 
 ## License
 
-Copyright (C) 2019-2025 Ben O'Neill <ben@oneill.sh>. License: MIT.
-See LICENSE for more details.
+Copyright (c) 2019-2025 Ben O'Neill <ben@oneill.sh>. This work is released under the
+terms of the MIT License. See [LICENSE](LICENSE) for the license terms.
