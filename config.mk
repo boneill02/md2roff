@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
-CPPFLAGS = 
+CPPFLAGS =
 CFLAGS   = -std=gnu99 -pedantic -Wall -I$(SRCPREFIX) -O2 $(CPPFLAGS)
 LDFLAGS  = $(CFLAGS) -s
 
