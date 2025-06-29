@@ -6,11 +6,11 @@ a Markdown file.
 
 ## Prerequisites
 
-* A `lex`
+* A [lex](https://gothub.dev.projectsegfau.lt/westes/flex/)
 
 ## Building
 
-```
+```shell
 make
 sudo make install
 ```
@@ -21,7 +21,7 @@ The wrapper program, `md2roff`, must take either `-ms` or `-man` as an argument.
 Arguments for `md2ms` and `md2man` may be added as well. Input and output files
 are `stdin` and `stdout` by default.
 
-```
+```shell
 md2roff [-ms|-man] [-t title] [-o outputfile] [args...] [inputfile]
 ```
 
@@ -29,8 +29,8 @@ md2roff [-ms|-man] [-t title] [-o outputfile] [args...] [inputfile]
 
 ### md2ms
 
-```
-md2ms [-bnp] [-a author] [-t tiitle] [-o outputfile] [inputfile]
+```shell
+md2ms [-bnp] [-t title] [-a author] [-o outputfile] [inputfile]
 ```
 
 * `-b`: Disable page break between the title page and contents.
@@ -41,7 +41,7 @@ md2ms [-bnp] [-a author] [-t tiitle] [-o outputfile] [inputfile]
 
 ### md2man
 
-```
+```shell
 md2man [-t title] [-o outputfile] [inputfile]
 ```
 
@@ -50,7 +50,7 @@ md2man [-t title] [-o outputfile] [inputfile]
 
 ### Examples
 
-```
+```shell
 # Convert to postscript
 md2roff -ms -t "My File" mymarkdown.md | groff -ms -Tps >myps.ps
 
@@ -60,6 +60,7 @@ md2roff -ms -t "My File" mymarkdown.md | groff -ms -Tpdf >mypdf.pdf
 # Convert to manpage
 md2roff -man -t 'MYMANPAGE 1 "May 2025" "mymanpage" "User Commands"' mymarkdown.md >mymanpage.1
 ```
+
 ## Bugs
 
 If you find a bug, submit an issue, PR, or email me with a description and/or patch.
