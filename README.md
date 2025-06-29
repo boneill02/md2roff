@@ -6,7 +6,7 @@ a Markdown file.
 
 ## Prerequisites
 
-* A [lex](https://gothub.dev.projectsegfau.lt/westes/flex/)
+* A [lex](https://github.com/westes/flex/)
 
 ## Building
 
